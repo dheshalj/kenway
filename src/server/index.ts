@@ -1,5 +1,5 @@
 import express, { RequestHandler } from 'express';
-import expressWs, { Application } from 'express-ws';
+import expressWs, { Application, Router } from 'express-ws';
 
 import { Kenway } from '..';
 
@@ -9,26 +9,23 @@ import { genUID } from '../utils';
 export class KenwayServer {
   #knwy: Kenway;
   app: Application;
-  #prefix?: string;
-  #port?: number;
-  constructor(knwy: Kenway, prefix?: string, port?: number) {
+  #router: Router;
+  #prefix: string;
+  constructor(knwy: Kenway, prefix: string) {
     this.#knwy = knwy;
     this.app = expressWs(express()).app;
+    this.#router = express.Router()
     this.#prefix = prefix;
-    this.#port = port ? port : 3030;
+    this.app.use(express.json());
   }
 
   use(...handlers: RequestHandler[]) {
-    this.app.use(handlers);
+    this.#router.use(handlers);
   }
 
   init() {
-    this.app.use(express.json());
-
-    const prefix = this.#prefix ? `/${this.#prefix}` : '';
-
     // GET
-    this.app.get(`${prefix}/:col`, (req, res) => {
+    this.#router.get(`/:col`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .get()
@@ -45,13 +42,13 @@ export class KenwayServer {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
         });
     });
-    this.app.get(`${prefix}/:col/:doc`, (req, res) => {
+    this.#router.get(`/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
         .get()
         .then((doc: Doc) => {
-          res.status(200).jsonp(JSON.stringify((doc as Doc).data()));
+          res.status(200).jsonp((doc as Doc).data());
         })
         .catch((err) => {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
@@ -59,7 +56,7 @@ export class KenwayServer {
     });
 
     // POST
-    this.app.post(`${prefix}/:col`, (req, res) => {
+    this.#router.post(`/:col`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(genUID())
@@ -71,7 +68,7 @@ export class KenwayServer {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
         });
     });
-    this.app.post(`${prefix}/:col/:doc`, (req, res) => {
+    this.#router.post(`/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -85,7 +82,7 @@ export class KenwayServer {
     });
 
     // PATCH
-    this.app.patch(`${prefix}/:col/:doc`, (req, res) => {
+    this.#router.patch(`/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -99,7 +96,7 @@ export class KenwayServer {
     });
 
     // DELETE
-    this.app.delete(`${prefix}/:col/:doc`, (req, res) => {
+    this.#router.delete(`/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -111,9 +108,10 @@ export class KenwayServer {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
         });
     });
+  }
 
-    this.app.listen(this.#port, () => {
-      // console.log(`Kenway DB listening on port ${this.#port}`);
-    });
+  listen(port?: number) {
+    this.app.use(`/${this.#prefix}`, this.#router)
+    this.app.listen(port ? port : 3030);
   }
 }

@@ -28,12 +28,11 @@ export class Kenway {
    */
   constructor({ dir, port }: { dir: string; port?: number }) {
     this.#vars.dir = join(dirname(require.main ? (require.main.filename as string) : __dirname), dir);
-    this.#vars.srv = new KenwayServer(this, 'knwy', port);
-    this.#vars.srv.init();
+    this.#vars.srv = new KenwayServer(this, 'knwy');
   }
 
   /**
-   * Get `Express.Application` of default `KenwayServer`.
+   * Get `Express.Application` of the default `KenwayServer`.
    * @since v1.3.2
    */
   get srv() {
@@ -58,6 +57,11 @@ export class Kenway {
    */
   use(...handlers: RequestHandler[]) {
     this.#vars.srv.use(...handlers);
+  }
+
+  listen(port?: number) {
+    this.#vars.srv.init()
+    this.#vars.srv.listen(port);
   }
 
   /**
