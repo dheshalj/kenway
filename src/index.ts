@@ -33,6 +33,14 @@ export class Kenway {
   }
 
   /**
+   * Get `Express.Application` of default `KenwayServer`.
+   * @since v1.3.2
+   */
+  get srv() {
+    return this.#vars.srv.app
+  }
+
+  /**
    * Creates reference to provided Collection. Returns `Collection`.
    * @since v1.0.0
    */
@@ -57,7 +65,7 @@ export class Kenway {
    * @since v1.0.0
    */
   config({ converter }: KenwayConfig = {}) {
-    if (converter != undefined) {
+    if (converter !== undefined) {
       this.#vars.converter.active = converter;
     }
   }

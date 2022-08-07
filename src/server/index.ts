@@ -8,27 +8,27 @@ import { genUID } from '../utils';
 
 export class KenwayServer {
   #knwy: Kenway;
-  #app: Application;
+  app: Application;
   #prefix?: string;
   #port?: number;
   constructor(knwy: Kenway, prefix?: string, port?: number) {
     this.#knwy = knwy;
-    this.#app = expressWs(express()).app;
+    this.app = expressWs(express()).app;
     this.#prefix = prefix;
     this.#port = port ? port : 3030;
   }
 
   use(...handlers: RequestHandler[]) {
-    this.#app.use(handlers);
+    this.app.use(handlers);
   }
 
   init() {
-    this.#app.use(express.json());
+    this.app.use(express.json());
 
     const prefix = this.#prefix ? `/${this.#prefix}` : '';
 
     // GET
-    this.#app.get(`${prefix}/:col`, (req, res) => {
+    this.app.get(`${prefix}/:col`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .get()
@@ -45,7 +45,7 @@ export class KenwayServer {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
         });
     });
-    this.#app.get(`${prefix}/:col/:doc`, (req, res) => {
+    this.app.get(`${prefix}/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -59,7 +59,7 @@ export class KenwayServer {
     });
 
     // POST
-    this.#app.post(`${prefix}/:col`, (req, res) => {
+    this.app.post(`${prefix}/:col`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(genUID())
@@ -71,7 +71,7 @@ export class KenwayServer {
           res.status(200).send(`${req.method} ${req.originalUrl} Failed Error: ${err.message}`);
         });
     });
-    this.#app.post(`${prefix}/:col/:doc`, (req, res) => {
+    this.app.post(`${prefix}/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -85,7 +85,7 @@ export class KenwayServer {
     });
 
     // PATCH
-    this.#app.patch(`${prefix}/:col/:doc`, (req, res) => {
+    this.app.patch(`${prefix}/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -99,7 +99,7 @@ export class KenwayServer {
     });
 
     // DELETE
-    this.#app.delete(`${prefix}/:col/:doc`, (req, res) => {
+    this.app.delete(`${prefix}/:col/:doc`, (req, res) => {
       this.#knwy
         .col(req.params.col)
         .doc(req.params.doc)
@@ -112,7 +112,7 @@ export class KenwayServer {
         });
     });
 
-    this.#app.listen(this.#port, () => {
+    this.app.listen(this.#port, () => {
       // console.log(`Kenway DB listening on port ${this.#port}`);
     });
   }
