@@ -2,6 +2,8 @@ import { join, dirname } from 'path';
 
 import { Collection } from './modules/Collection';
 import { KenwayVars, KenwayConfig } from './interfaces';
+import { KenwayServer } from './server';
+import { RequestHandler } from 'express';
 
 /**
  * Entry point of Kenway. Returns `Kenway`.
@@ -11,6 +13,7 @@ export class Kenway {
   #vars: KenwayVars = {
     path: '',
     dir: '',
+    srv: undefined!,
     query: [],
     converter: {
       active: false,
@@ -25,6 +28,8 @@ export class Kenway {
    */
   constructor({ dir, port }: { dir: string, port?: number }) {
     this.#vars.dir = join(dirname(module.parent?.filename as string), dir)
+    this.#vars.srv = new KenwayServer(this, 'knwy', port)
+    this.#vars.srv.init()
   }
 
   /**
@@ -40,16 +45,20 @@ export class Kenway {
   }
 
   /**
+   * Custom Middleware for the server.
+   * @since v1.0.0
+   */
+  use(...handlers: RequestHandler[]) {
+    this.#vars.srv.use(...handlers)
+  }
+
+  /**
    * Change global config of current `Kenway` instance. Returns `void`.
    * @since v1.0.0
    */
   config({ converter }: KenwayConfig = {}) {
-    if (converter !== undefined) {
+    if (converter != undefined) {
       this.#vars.converter.active = converter;
     }
-  }
-
-  static Express() {
-    return 
   }
 }

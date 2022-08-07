@@ -1,5 +1,8 @@
+import { KenwayServer } from "./server";
+
 export interface KenwayVars {
   dir: string;
+  srv: KenwayServer;
   path: string;
   query: [key: string, op: string, value: string | number | boolean][];
   converter: ConverterOptions & { active: boolean };
