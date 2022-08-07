@@ -53,7 +53,7 @@ export class Collection {
               const data: any = JSON.parse(KenwayIO.read(join(folderpath, d.name, 'data.json')));
               let returnVal = false;
               vars.query.forEach((q) => {
-                let tmp = {
+                const tmp = {
                   '==': q[0].split('.').reduce((a: any, c: any) => a[c], data) === q[2],
                 }[q[1]];
 
