@@ -60,7 +60,7 @@ export class Kenway {
   }
 
   listen(port?: number) {
-    this.#vars.srv.init()
+    this.#vars.srv.init();
     this.#vars.srv.listen(port);
   }
 

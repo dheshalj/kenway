@@ -14,7 +14,7 @@ export class KenwayServer {
   constructor(knwy: Kenway, prefix: string) {
     this.#knwy = knwy;
     this.app = expressWs(express()).app;
-    this.#router = express.Router()
+    this.#router = express.Router();
     this.#prefix = prefix;
     this.app.use(express.json());
   }
@@ -111,7 +111,7 @@ export class KenwayServer {
   }
 
   listen(port?: number) {
-    this.app.use(`/${this.#prefix}`, this.#router)
+    this.app.use(`/${this.#prefix}`, this.#router);
     this.app.listen(port ? port : 3030);
   }
 }
