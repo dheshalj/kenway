@@ -1,4 +1,4 @@
-export { KenwayIO } from './io'
+export { KenwayIO } from './io';
 
 export const genUID = () => {
   let d = new Date().getTime();

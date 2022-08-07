@@ -1,4 +1,4 @@
-import { KenwayServer } from "./server";
+import { KenwayServer } from './server';
 
 export interface KenwayVars {
   dir: string;

@@ -26,10 +26,10 @@ export class Kenway {
    * Creates a new `Kenway` instance. Returns `Kenway`.
    * @since v1.0.0
    */
-  constructor({ dir, port }: { dir: string, port?: number }) {
-    this.#vars.dir = join(dirname(require.main ? require.main.filename as string : __dirname), dir)
-    this.#vars.srv = new KenwayServer(this, 'knwy', port)
-    this.#vars.srv.init()
+  constructor({ dir, port }: { dir: string; port?: number }) {
+    this.#vars.dir = join(dirname(require.main ? (require.main.filename as string) : __dirname), dir);
+    this.#vars.srv = new KenwayServer(this, 'knwy', port);
+    this.#vars.srv.init();
   }
 
   /**
@@ -37,7 +37,7 @@ export class Kenway {
    * @since v1.3.2
    */
   get srv() {
-    return this.#vars.srv.app
+    return this.#vars.srv.app;
   }
 
   /**
@@ -57,7 +57,7 @@ export class Kenway {
    * @since v1.0.0
    */
   use(...handlers: RequestHandler[]) {
-    this.#vars.srv.use(...handlers)
+    this.#vars.srv.use(...handlers);
   }
 
   /**

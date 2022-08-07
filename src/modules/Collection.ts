@@ -20,7 +20,7 @@ export class Collection {
   add(data: any): Promise<ReturnMsg> {
     return this.doc(genUID()).set(data);
   }
-  
+
   get(): Promise<Doc[]> {
     return this.#get(this.#vars);
   }

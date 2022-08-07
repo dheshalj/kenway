@@ -51,7 +51,7 @@ export class Document {
 
     return new Promise((resolve, reject) => {
       try {
-        KenwayIO.write(f, JSON.stringify(fe && merge ? Object.assign(readJsonSync(f), data) : data))
+        KenwayIO.write(f, JSON.stringify(fe && merge ? Object.assign(readJsonSync(f), data) : data));
         resolve({
           id: q[q.length - 1],
           msg: `Document <${q[q.length - 1]}> was ${
