@@ -2,7 +2,7 @@ import { join } from 'path';
 import { existsSync, readdirSync } from 'fs-extra';
 
 import { Document } from './Document';
-import { ConverterOptions, Doc, SetReturn, KenwayConfig, KenwayVars } from '../interfaces';
+import { ConverterOptions, Doc, ReturnMsg, KenwayConfig, KenwayVars } from '../interfaces';
 import { genUID, KenwayIO } from '../utils';
 
 export class Collection {
@@ -17,7 +17,7 @@ export class Collection {
     return new Document(this.#vars);
   }
 
-  add(data: any): Promise<SetReturn> {
+  add(data: any): Promise<ReturnMsg> {
     return this.doc(genUID()).set(data);
   }
   
@@ -42,7 +42,6 @@ export class Collection {
   }
 
   #get(vars: KenwayVars): Promise<Doc[]> {
-    // TODO: Switch dir to socks
     return new Promise((resolve, reject) => {
       const folderpath: string = join(vars.dir, ...vars.path.slice(0, -1).split('/'));
       if (existsSync(folderpath)) {
@@ -79,7 +78,7 @@ export class Collection {
   }
 
   config({ converter }: KenwayConfig = {}) {
-    if (converter) {
+    if (converter !== undefined) {
       this.#vars.converter.active = converter;
     }
   }

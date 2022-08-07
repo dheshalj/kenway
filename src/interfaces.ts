@@ -1,11 +1,6 @@
-import { Server } from "http";
-import { KenwaySocket } from "./server";
-
 export interface KenwayVars {
   dir: string;
-  srv: Server;
   path: string;
-  soc: KenwaySocket;
   query: [key: string, op: string, value: string | number | boolean][];
   converter: ConverterOptions & { active: boolean };
 }
@@ -24,7 +19,7 @@ export interface SetOptions {
   merge?: boolean;
 }
 
-export interface SetReturn {
+export interface ReturnMsg {
   id: string;
   msg: string;
 }

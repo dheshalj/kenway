@@ -2,7 +2,7 @@ import { join } from 'path';
 import { existsSync, ensureFileSync, readJsonSync, rmSync } from 'fs-extra';
 
 import { Collection } from './Collection';
-import { KenwayVars, Doc, KenwayConfig, SetOptions, ConverterOptions, SetReturn } from '../interfaces';
+import { KenwayVars, Doc, KenwayConfig, SetOptions, ConverterOptions, ReturnMsg } from '../interfaces';
 import { transformObj, KenwayIO } from '../utils';
 
 export class Document {
@@ -22,11 +22,10 @@ export class Document {
   }
 
   /**
-   * Writes provided `data`. Returns `Promise<SetReturn>`.
+   * Writes the provided `data` to the document. Returns `Promise<ReturnMsg>`.
    * @since v1.0.0
    */
-  set(data: any, { merge }: SetOptions = {}): Promise<SetReturn> {
-    // TODO: Switch dir to socks
+  set(data: any, { merge }: SetOptions = {}): Promise<ReturnMsg> {
     const vars = this.#vars;
     const q: string[] = vars.path.slice(0, -1).split('/');
     const f: string = join(vars.dir, ...q, 'data.json');
@@ -58,14 +57,14 @@ export class Document {
           msg: `Document <${q[q.length - 1]}> was ${
             merge ? `merged with the contents` : 'created using data provided'
           }`,
-        } as SetReturn);
+        } as ReturnMsg);
       } catch (e) {
         reject(`ERROR: ${e}`);
       }
     });
   }
 
-  update(data: any): Promise<SetReturn> {
+  update(data: any): Promise<ReturnMsg> {
     const filename: string = join(this.#vars.dir, ...this.#vars.path.slice(0, -1).split('/'), 'data.json');
     if (existsSync(filename)) {
       return this.set(transformObj(data), { merge: true });
@@ -76,7 +75,6 @@ export class Document {
   }
 
   get(): Promise<Doc> {
-    // TODO: Switch dir to socks
     const vars = this.#vars;
     const query: string[] = vars.path.slice(0, -1).split('/');
     return new Promise((resolve, reject) => {
@@ -108,8 +106,7 @@ export class Document {
     });
   }
 
-  delete(): Promise<SetReturn> {
-    // TODO: Switch dir to socks
+  delete(): Promise<ReturnMsg> {
     const q: string[] = this.#vars.path.slice(0, -1).split('/');
     return new Promise((resolve, reject) => {
       try {
@@ -117,7 +114,7 @@ export class Document {
         resolve({
           id: q[q.length - 1],
           msg: `Document <${q[q.length - 1]}> was successfully deleted`,
-        } as SetReturn);
+        } as ReturnMsg);
       } catch (e) {
         reject(`ERROR: Failed to delete Document <${q[q.length - 1]}> : ${e}`);
       }
@@ -125,7 +122,7 @@ export class Document {
   }
 
   config({ converter }: KenwayConfig = {}) {
-    if (converter) {
+    if (converter !== undefined) {
       this.#vars.converter.active = converter;
     }
   }

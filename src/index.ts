@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Server, IncomingMessage, ServerResponse } from 'http';
 import { join, dirname } from 'path';
-import WebSocket = require('ws');
 
 import { Collection } from './modules/Collection';
 import { KenwayVars, KenwayConfig } from './interfaces';
-import { KenwayServer, KenwaySocket } from './server';
 
 /**
  * Entry point of Kenway. Returns `Kenway`.
@@ -15,8 +11,6 @@ export class Kenway {
   #vars: KenwayVars = {
     path: '',
     dir: '',
-    srv: undefined!,
-    soc: undefined!,
     query: [],
     converter: {
       active: false,
@@ -29,15 +23,8 @@ export class Kenway {
    * Creates a new `Kenway` instance. Returns `Kenway`.
    * @since v1.0.0
    */
-  constructor({ dir, srv }: { dir: string, srv: Server }) {
+  constructor({ dir, port }: { dir: string, port?: number }) {
     this.#vars.dir = join(dirname(module.parent?.filename as string), dir)
-    this.#vars.srv = srv
-    this.#vars.srv.on('request', (req: IncomingMessage, res: ServerResponse) => {
-      const server = new KenwayServer(this.#vars, req, res, 'knwy')
-      server.init()
-    })
-    this.#vars.soc = new KenwaySocket(new WebSocket.Server({ server: srv }))
-    this.#vars.soc.init()
   }
 
   /**
@@ -57,8 +44,12 @@ export class Kenway {
    * @since v1.0.0
    */
   config({ converter }: KenwayConfig = {}) {
-    if (converter) {
+    if (converter !== undefined) {
       this.#vars.converter.active = converter;
     }
+  }
+
+  static Express() {
+    return 
   }
 }
