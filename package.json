@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "tsc",
+    "build": "node -e \"require('fs-extra').emptyDir('dist');\" && tsc",
     "start": "node dist/index.js",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
