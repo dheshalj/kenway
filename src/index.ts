@@ -27,7 +27,7 @@ export class Kenway {
    * @since v1.0.0
    */
   constructor({ dir, port }: { dir: string, port?: number }) {
-    this.#vars.dir = join(dirname(module.parent?.filename as string), dir)
+    this.#vars.dir = join(dirname(require.main?.filename as string), dir)
     this.#vars.srv = new KenwayServer(this, 'knwy', port)
     this.#vars.srv.init()
   }
