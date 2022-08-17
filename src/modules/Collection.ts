@@ -54,10 +54,10 @@ export class Collection {
               if (vars.query === undefined || vars.query.length === 0) return true;
               const data: any = JSON.parse(KenwayIO.read(join(folderpath, d.name, 'data.json')));
               let returnVal = false;
-              vars.query.forEach((q) => {
+              vars.query.forEach((nq) => {
                 const tmp = {
-                  '==': q[0].split('.').reduce((a: any, c: any) => a[c], data) === q[2],
-                }[q[1]];
+                  '==': nq[0].split('.').reduce((a: any, c: any) => a[c], data) === nq[2],
+                }[nq[1]];
 
                 returnVal = tmp ? tmp : false;
               });
