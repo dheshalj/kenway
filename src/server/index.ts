@@ -27,7 +27,7 @@ export class KenwayServer {
 
   init() {
     this.#router.all('*', (req, res) => {
-      var newurl = new URL(req.url, `http://${req.headers.host}`);
+      const newurl = new URL(req.url, `http://${req.headers.host}`);
       const path = newurl.pathname.split('/').filter((x) => x);
       if (path.length > 0) {
         this.#knwy.vars.path = `${newurl.pathname
