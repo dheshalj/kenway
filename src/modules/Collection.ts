@@ -43,7 +43,9 @@ export class Collection {
 
   #get(vars: KenwayVars): Promise<Doc[]> {
     return new Promise((resolve, reject) => {
-      const folderpath: string = join(vars.dir, ...vars.path.slice(0, -1).split('/'));
+      const q: string[] = vars.path.slice(0, -1).split('/');
+      const folderpath: string = join(vars.dir, ...q);
+
       if (existsSync(folderpath)) {
         resolve(
           readdirSync(folderpath, { withFileTypes: true })
@@ -74,7 +76,7 @@ export class Collection {
               };
             }) as Doc[],
         );
-      } else reject('Document not found');
+      } else reject(`Collection <${q[q.length - 1]}> not found`);
     });
   }
 

@@ -40,6 +40,14 @@ export class Kenway {
   }
 
   /**
+   *
+   * @since v1.3.2
+   */
+  get vars() {
+    return this.#vars;
+  }
+
+  /**
    * Creates reference to provided Collection. Returns `Collection`.
    * @since v1.0.0
    */

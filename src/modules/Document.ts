@@ -59,19 +59,17 @@ export class Document {
           }`,
         } as ReturnMsg);
       } catch (e) {
-        reject(`ERROR: ${e}`);
+        reject(e);
       }
     });
   }
 
   update(data: any): Promise<ReturnMsg> {
-    const filename: string = join(this.#vars.dir, ...this.#vars.path.slice(0, -1).split('/'), 'data.json');
+    const q: string[] = this.#vars.path.slice(0, -1).split('/');
+    const filename: string = join(this.#vars.dir, ...q, 'data.json');
     if (existsSync(filename)) {
       return this.set(transformObj(data), { merge: true });
-    } else
-      return new Promise((resolve, reject) => {
-        reject("Document doesn't exist");
-      });
+    } else return new Promise((resolve, reject) => reject(`Document <${q[q.length - 1]}> doesn't exist`));
   }
 
   get(): Promise<Doc> {
@@ -102,7 +100,7 @@ export class Document {
             } else return data;
           },
         } as Doc);
-      } else reject('Document not found');
+      } else reject(`Document <${query[query.length - 1]}> not found`);
     });
   }
 
@@ -116,7 +114,7 @@ export class Document {
           msg: `Document <${q[q.length - 1]}> was successfully deleted`,
         } as ReturnMsg);
       } catch (e) {
-        reject(`ERROR: Failed to delete Document <${q[q.length - 1]}> : ${e}`);
+        reject(`Faled to Delete Document <${q[q.length - 1]}> : ${e}`);
       }
     });
   }
