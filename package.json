@@ -21,15 +21,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dheshalj/kenway.git"
+    "url": "git+https://github.com/dheshal/kenway.git"
   },
   "keywords": [],
   "author": "Dheshal Jayamanne <dheshal.j@gmail.com> (https://dheshal.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dheshalj/kenway/issues"
+    "url": "https://github.com/dheshal/kenway/issues"
   },
-  "homepage": "https://dheshalj.github.io/kenway/",
+  "homepage": "https://dheshal.github.io/kenway/",
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/express-ws": "^3.0.1",
