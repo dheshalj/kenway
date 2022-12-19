@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Kenway',
   tagline: 'A fast local database with a pre-defined API',
-  url: 'https://dheshalj.github.io',
+  url: 'https://dheshal.github.io',
   baseUrl: '/kenway/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -16,7 +16,7 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'dheshalj', // Usually your GitHub org/user name.
+  organizationName: 'dheshal', // Usually your GitHub org/user name.
   projectName: 'kenway', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
@@ -59,7 +59,7 @@ const config = {
       navbar: {
         title: 'Kenway',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Kenway Logo',
           src: 'img/kenway.svg',
         },
         items: [
@@ -71,7 +71,7 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/dheshal/kenway',
             label: 'GitHub',
             position: 'right',
           },
@@ -115,12 +115,12 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                href: 'https://github.com/dheshal/kenway',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Kenway. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Kenway. Dheshal Jayamanne.`,
       },
       prism: {
         theme: lightCodeTheme,
