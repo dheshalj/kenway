@@ -21,15 +21,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dheshal/kenway.git"
+    "url": "git+https://github.com/dheshalj/kenway.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [],
   "author": "Dheshal Jayamanne <dheshal.j@gmail.com> (https://dheshal.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dheshal/kenway/issues"
+    "url": "https://github.com/dheshalj/kenway/issues"
   },
-  "homepage": "https://dheshal.github.io/kenway/",
+  "homepage": "https://dheshalj.github.io/kenway/",
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/express-ws": "^3.0.1",
