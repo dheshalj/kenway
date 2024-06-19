@@ -2,131 +2,106 @@ import { join } from 'path';
 import { existsSync, ensureFileSync, readJsonSync, rmSync } from 'fs-extra';
 
 import { Collection } from './Collection';
-import { KenwayVars, Doc, KenwayConfig, SetOptions, ConverterOptions, ReturnMsg } from '../interfaces';
+import { Properties, Doc, Config, SetOptions, ConverterOptions, ReturnMsg } from '../interfaces';
 import { transformObj, KenwayIO } from '../utils';
 
 export class Document {
-  #vars: KenwayVars;
+  #vars: Properties;
 
-  constructor(vars: KenwayVars) {
+  constructor(vars: Properties) {
     this.#vars = vars;
   }
 
-  /**
-   * Creates reference to provided Collection. Returns `Collection`.
-   * @since v1.0.0
-   */
   col(id: string): Collection {
-    this.#vars.path += `${id}/`;
-    return new Collection(this.#vars);
+    const updatedVars = { ...this.#vars, path: `${this.#vars.path}${id}/` };
+    return new Collection(updatedVars);
   }
 
-  /**
-   * Writes the provided `data` to the document. Returns `Promise<ReturnMsg>`.
-   * @since v1.0.0
-   */
-  set(data: any, { merge }: SetOptions = {}): Promise<ReturnMsg> {
-    const vars = this.#vars;
-    const q: string[] = vars.path.slice(0, -1).split('/');
-    const f: string = join(vars.dir, ...q, 'data.json');
-    const fe: boolean = existsSync(f);
-    ensureFileSync(f);
+  async set(data: any, { merge }: SetOptions = {}): Promise<ReturnMsg> {
+    const q = this.#vars.path.split('/').filter(Boolean);
+    const filePath = join(this.#vars.directory, ...q, 'data.json');
+    const fileExists = existsSync(filePath);
+    ensureFileSync(filePath);
 
-    if (vars.converter.active) {
-      data = (function c(d: any): any {
-        for (const k of Object.keys(d)) {
-          if (typeof d[k] === 'object') {
-            vars.converter.toKnwy((...cases: [any, any][]): any => {
-              let r: any;
-              cases.forEach((cs) => {
-                if (d[k].constructor === cs[0]) r = cs[1](d[k]);
-              });
-              d[k] = r !== undefined ? { __ClassName: d[k].constructor.name, ...r } : c(d[k]);
-            });
-          }
-        }
-        return d;
-      })(data);
+    if (this.#vars.converter.active) {
+      data = this.#convertData(data, this.#vars.converter.toKnwy);
     }
 
-    return new Promise((resolve, reject) => {
-      try {
-        KenwayIO.write(f, JSON.stringify(fe && merge ? Object.assign(readJsonSync(f), data) : data));
-        resolve({
-          id: q[q.length - 1],
-          msg: `Document <${q[q.length - 1]}> was ${
-            merge ? `merged with the contents` : 'created using data provided'
-          }`,
-        } as ReturnMsg);
-      } catch (e) {
-        reject(e);
-      }
-    });
+    try {
+      KenwayIO.write(filePath, JSON.stringify(fileExists && merge ? { ...readJsonSync(filePath), ...data } : data));
+      return {
+        id: q[q.length - 1],
+        msg: `Document <${q[q.length - 1]}> was ${merge ? 'merged with the contents' : 'created using data provided'}`,
+      };
+    } catch (error) {
+      throw new Error(error as string);
+    }
   }
 
-  update(data: any): Promise<ReturnMsg> {
-    const q: string[] = this.#vars.path.slice(0, -1).split('/');
-    const filename: string = join(this.#vars.dir, ...q, 'data.json');
-    if (existsSync(filename)) {
+  async update(data: any): Promise<ReturnMsg> {
+    const q = this.#vars.path.split('/').filter(Boolean);
+    const filePath = join(this.#vars.directory, ...q, 'data.json');
+
+    if (existsSync(filePath)) {
       return this.set(transformObj(data), { merge: true });
-    } else return new Promise((resolve, reject) => reject(`Document <${q[q.length - 1]}> doesn't exist`));
+    } else {
+      throw new Error(`Document <${q[q.length - 1]}> doesn't exist`);
+    }
   }
 
-  get(): Promise<Doc> {
-    const vars = this.#vars;
-    const query: string[] = vars.path.slice(0, -1).split('/');
-    return new Promise((resolve, reject) => {
-      const filename: string = join(vars.dir, ...query, 'data.json');
-      if (existsSync(filename)) {
-        resolve({
-          id: query[query.length - 1],
-          exists: true,
-          data: () => {
-            let data = JSON.parse(KenwayIO.read(filename));
-            if (vars.converter.active) {
-              data = (function c(d: any): any {
-                for (const k of Object.keys(d)) {
-                  if (typeof d[k] === 'object') {
-                    vars.converter.fromKnwy((...cases: [any, any][]): any => {
-                      cases.forEach((cs) => {
-                        d[k] = d[k].__ClassName === cs[0] ? cs[1](d[k]) : c(d[k]);
-                      });
-                    });
-                  }
-                }
-                return d;
-              })(data);
-              return data;
-            } else return data;
-          },
-        } as Doc);
-      } else reject(`Document <${query[query.length - 1]}> not found`);
-    });
+  async get(): Promise<Doc> {
+    const q = this.#vars.path.split('/').filter(Boolean);
+    const filePath = join(this.#vars.directory, ...q, 'data.json');
+
+    if (existsSync(filePath)) {
+      return {
+        id: q[q.length - 1],
+        exists: true,
+        data: () => {
+          let data = JSON.parse(KenwayIO.read(filePath));
+          if (this.#vars.converter.active) {
+            data = this.#convertData(data, this.#vars.converter.fromKnwy);
+          }
+          return data;
+        },
+      };
+    } else {
+      throw new Error(`Document <${q[q.length - 1]}> not found`);
+    }
   }
 
-  delete(): Promise<ReturnMsg> {
-    const q: string[] = this.#vars.path.slice(0, -1).split('/');
-    return new Promise((resolve, reject) => {
-      try {
-        rmSync(join(this.#vars.dir, ...q), { recursive: true, force: true });
-        resolve({
-          id: q[q.length - 1],
-          msg: `Document <${q[q.length - 1]}> was successfully deleted`,
-        } as ReturnMsg);
-      } catch (e) {
-        reject(`Faled to Delete Document <${q[q.length - 1]}> : ${e}`);
-      }
-    });
+  async delete(): Promise<ReturnMsg> {
+    const q = this.#vars.path.split('/').filter(Boolean);
+    const filePath = join(this.#vars.directory, ...q);
+
+    try {
+      rmSync(filePath, { recursive: true, force: true });
+      return {
+        id: q[q.length - 1],
+        msg: `Document <${q[q.length - 1]}> was successfully deleted`,
+      };
+    } catch (error) {
+      throw new Error(`Failed to delete Document <${q[q.length - 1]}> : ${error}`);
+    }
   }
 
-  config({ converter }: KenwayConfig = {}) {
+  config({ converter }: Config = {}) {
     if (converter !== undefined) {
       this.#vars.converter.active = converter;
     }
   }
 
-  withConvertor({ toKnwy, fromKnwy }: ConverterOptions) {
+  withConverter({ toKnwy, fromKnwy }: ConverterOptions) {
     this.#vars.converter = { active: true, toKnwy, fromKnwy };
     return this;
+  }
+
+  #convertData(data: any, convertFunction: Function): any {
+    const convertedData = convertFunction(data);
+    if (typeof convertedData !== 'undefined') {
+      return convertedData;
+    } else {
+      return data;
+    }
   }
 }

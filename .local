@@ -1,0 +1,18 @@
+Jackdaw Server - Authentication
+
+
+
+make documents as tables using .CSV files
+read them one by one, use a number at an ID to make data efficent
+
+
+
+
+
+
+
+
+Publish Package
+
+- run `npm version patch`
+- Create new release & Publish it

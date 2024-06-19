@@ -1,14 +1,14 @@
-import { KenwayServer } from './server';
+import { Jackdaw } from './server';
 
-export interface KenwayVars {
-  dir: string;
-  srv: KenwayServer;
+export interface Properties {
+  directory: string;
+  server: Jackdaw;
   path: string;
   query: [key: string, op: string, value: string | number | boolean][];
   converter: ConverterOptions & { active: boolean };
 }
 
-export interface KenwayConfig {
+export interface Config {
   converter?: boolean;
 }
 
@@ -28,6 +28,7 @@ export interface ReturnMsg {
 }
 
 export interface ConverterOptions {
+  active: boolean;
   toKnwy: (switcher: (...cases: [any, any][]) => any) => any;
   fromKnwy: (switcher: (...cases: [any, any][]) => any) => any;
 }

@@ -1,19 +1,20 @@
 import { join, dirname } from 'path';
 
 import { Collection } from './modules/Collection';
-import { KenwayVars, KenwayConfig } from './interfaces';
-import { KenwayServer } from './server';
+import { Properties, Config } from './interfaces';
+import { Jackdaw } from './server';
 import { RequestHandler } from 'express';
 
 /**
  * Entry point of Kenway. Returns `Kenway`.
  * @since v1.0.0
  */
+// TODO: make var names readable
 export class Kenway {
-  #vars: KenwayVars = {
+  properties: Properties = {
     path: '',
-    dir: '',
-    srv: undefined!,
+    directory: '',
+    server: undefined!,
     query: [],
     converter: {
       active: false,
@@ -26,25 +27,9 @@ export class Kenway {
    * Creates a new `Kenway` instance. Returns `Kenway`.
    * @since v1.0.0
    */
-  constructor({ dir, port }: { dir: string; port?: number }) {
-    this.#vars.dir = join(dirname(require.main ? (require.main.filename as string) : __dirname), dir);
-    this.#vars.srv = new KenwayServer(this, 'knwy');
-  }
-
-  /**
-   * Get `Express.Application` of the default `KenwayServer`.
-   * @since v1.3.2
-   */
-  get srv() {
-    return this.#vars.srv.app;
-  }
-
-  /**
-   *
-   * @since v1.3.2
-   */
-  get vars() {
-    return this.#vars;
+  constructor(dir: string) {
+    this.properties.directory = join(dirname(require.main ? (require.main.filename as string) : __dirname), dir);
+    this.properties.server = new Jackdaw(this, 'knwy');
   }
 
   /**
@@ -52,11 +37,11 @@ export class Kenway {
    * @since v1.0.0
    */
   col(id: string): Collection {
-    this.#vars.path = `${id}/`;
-    this.#vars.query = [];
-    this.#vars.converter = { active: false, toKnwy: () => undefined, fromKnwy: () => undefined };
+    this.properties.path = `${id}/`;
+    this.properties.query = [];
+    this.properties.converter = { active: false, toKnwy: () => undefined, fromKnwy: () => undefined };
 
-    return new Collection(this.#vars);
+    return new Collection(this.properties);
   }
 
   /**
@@ -64,21 +49,25 @@ export class Kenway {
    * @since v1.0.0
    */
   use(...handlers: RequestHandler[]) {
-    this.#vars.srv.use(...handlers);
+    this.properties.server.use(...handlers);
   }
 
+  /**
+   * Listens for incoming requests on a specified port.
+   *
+   * @param {number} [port] - The port number to listen on.
+   */
   listen(port?: number) {
-    this.#vars.srv.init();
-    this.#vars.srv.listen(port);
+    this.properties.server.listen(port);
   }
 
   /**
    * Change global config of current `Kenway` instance. Returns `void`.
    * @since v1.0.0
    */
-  config({ converter }: KenwayConfig = {}) {
+  config({ converter }: Config = {}) {
     if (converter !== undefined) {
-      this.#vars.converter.active = converter;
+      this.properties.converter.active = converter;
     }
   }
 }
